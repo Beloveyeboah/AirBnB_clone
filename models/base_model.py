@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
-"""BaseModel established ground for 
+"""BaseModel established ground for
 all common attributes/methods for other classes"""
 
 import uuid
-import datetime import datetime
-from models.__init__ import storage
+from datetime import datetime
+from models import storage
+
 
 class BaseModel():
     """ this model Parent class of the Model"""
@@ -18,8 +19,8 @@ class BaseModel():
                 if key == '__class__':
                     continue
                 elif key == 'created_at' or key == 'updated_at':
-                        value = datetime.striptime(value, '%Y-%m-%dT%H:%M:%S.%f')
-                        setattr(self, key, value)
+                    value = datetime.striptime(value, '%Y-%m-%dT%H:%M:%S.%f')
+                    setattr(self, key, value)
                 else:
                     self.__dict = kwargs
         else:
