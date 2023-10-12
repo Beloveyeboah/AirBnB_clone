@@ -14,6 +14,43 @@ class HBNBCommand(cmd.Cmd):
 
     prompt = "(hbnb)"
 
+    def default(self, args):
+        """serves as a default interpretator"""
+
+        self.checkcmd(args)
+
+    def checkcmd(self, args):
+        """validate the commands for class.syntax()"""
+
+        match = re.search(r"^(\w*)\.(\w+)(?:\(([^)]*)\))$", args)
+        if not match:
+            return (args)
+        classname = match.group(1)
+        method = match.group(2)
+        arg = match.group(3)
+        match_uid_and_arg = re.search('^"([^"]*)"(?:, (.*))?$', args)
+        if match_uid_and_arg:
+            uid = match_uid_and_arg.group(1)
+            attr_or_dict = match_uid_and_arg.group(2)
+        else:
+            uid = arg
+            attr_or_dict = False
+
+        attr_and_value = ""
+        if method == "update" and attr_or_dict:
+            match_dict = re.search('^({.*})$', attr_or_dict)
+            if match_dict:
+                self.update_dict(classname, uid, match_dict.group(1))
+                return ""
+            match_attr_and_value = re.search(
+                '^(?:"([^"]*)")?(?:, (.*))?$', attr_or_dict)
+            if match_attr_and_value:
+                attr_and_value = (match_attr_and_value.group(
+                    1) or "") + " " + (match_attr_and_value.group(2) or "")
+        cmds = method + " " + classname + " " + uid + " " + attr_and_value
+        self.onecmd(cmds)
+        return cmds
+
     def do_create(self, args):
         """creates an instance of BaseModel"""
 
@@ -36,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         else:
-            args_list = line.split(' ')
+            args_list = line.split()
             if args_lis[0] not in storage.classes():
                 print("** class doesn't exist **")
             elif len(args_list) < 2:
@@ -47,7 +84,6 @@ class HBNBCommand(cmd.Cmd):
                     print("** no instance found **")
                 else:
                     print(storage.all()[key])
-
 
     def do_destroy(self, args):
         """Deletes an instance based on the class name and id"""
@@ -80,7 +116,7 @@ class HBNBCommand(cmd.Cmd):
                 return
             else:
                 var = [str(obj) for key, obj in storage.all().items()
-                      if type(obj).__name__ == words[0]]
+                       if type(obj).__name__ == args_list[0]]
                 print(var)
         else:
             new_list = [str(obj) for key, obj in storage.all().items()]
@@ -93,8 +129,8 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
 
-        rex = r'^(\S+)(?:\s(\S+)(?:\s(\S+)(?:\s((?:"[^"]*")|(?:(\S)+)))?)?)?'
-        match = re.search(rex, args)
+        reg = r'^(\S+)(?:\s(\S+)(?:\s(\S+)(?:\s((?:"[^"]*")|(?:(\S)+)))?)?)?'
+        match = re.search(reg, args)
         classname = match.group(1)
         uid = match.group(2)
         attribute = match.group(3)
@@ -122,7 +158,7 @@ class HBNBCommand(cmd.Cmd):
                         cast = int
                 else:
                     value = value.replace('"', '')
-                attributes = storage.attributes()[classname]
+                    attributes = storage.attributes()[classname]
                 if attribute in attributes:
                     value = attributes[attribute](value)
                 elif cast:
@@ -132,6 +168,21 @@ class HBNBCommand(cmd.Cmd):
                         pass  # fine, stay a string then
                 setattr(storage.all()[key], attribute, value)
                 storage.all()[key].save()
+
+    def do_count(self, args):
+        """Counts the number of instances of a class.
+        """
+        args_list = args.split()
+        if not args_list[0]:
+            print("** class name missing **")
+            return
+        elif args_list[0] not in storage.classes():
+            print("** class doesn't exist **")
+        else:
+            matches = [
+                k for k in storage.all() if k.startswith(
+                    args_list[0] + '.')]
+            print(len(matches))
 
     def quit(self):
         """ths exits the console of airbnb"""
@@ -152,15 +203,15 @@ class HBNBCommand(cmd.Cmd):
     def do_count(self, args):
         """Counts the total instances of a class.
         """
-        args = line.split(' ')
-        if not args[0]:
+        args_list = args.split(' ')
+        if not args_list[0]:
             print("** class name missing **")
-        elif args[0] not in storage.classes():
+        elif args_list[0] not in storage.classes():
             print("** class doesn't exist **")
         else:
             matches = [
                 k for k in storage.all() if k.startswith(
-                    args[0] + '.')]
+                    args_list[0] + '.')]
             print(len(matches))
 
 
