@@ -6,13 +6,6 @@ deserializes JSON file to instances"""
 import json
 import os
 import datetime
-from models.user import User
-from models.state import State
-from models.city import City
-from models.place import Place
-from models.amenity import Amenity
-from models.review import Review
-
 
 class FileStorage:
     """this creates the path to the json files"""
@@ -23,7 +16,7 @@ class FileStorage:
     def all(self):
         """returns all dictionaries"""
 
-        return FileStorage__objects
+        return FileStorage.__objects
 
     def new(self, obj):
         """sets key and values"""
