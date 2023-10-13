@@ -1,9 +1,17 @@
 #!/usr/bin/python3
 
-"""serializes instances to a JSON file and deserializes JSON file to instances"""
+"""serializes instances to a JSON file and
+deserializes JSON file to instances"""
+
 import json
 import os
 import datetime
+from models.user import User
+from models.state import State
+from models.city import City
+from models.place import Place
+from models.amenity import Amenity
+from models.review import Review
 
 
 class FileStorage:
@@ -20,27 +28,8 @@ class FileStorage:
     def new(self, obj):
         """sets key and values"""
 
-        key = obj.__class__.name__+ "." + obj.id
+        key = obj.__class__.name__ + "." + obj.id
         self.__objects[key] = obj
-
-    def classes(self):
-        """Returns a dictionary of valid classes and their references"""
-        from models.base_model import BaseModel
-        from models.user import User
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.place import Place
-        from models.review import Review
-
-        classes = {"BaseModel": BaseModel,
-                   "User": User,
-                   "State": State,
-                   "City": City,
-                   "Amenity": Amenity,
-                   "Place": Place,
-                   "Review": Review}
-        return classes
 
     def save(self):
         """serializes python objects into json"""
