@@ -34,23 +34,6 @@ class HBNBCommand(cmd.Cmd):
 
     prompt = "(hbnb) "
 
-    from models.user import User
-    from models.state import State
-    from models.city import City
-    from models.amenity import Amenity
-    from models.place import Place
-    from models.review import Review
-
-    __classes = {
-        "BaseModel",
-        "User",
-        "State",
-        "City",
-        "Place",
-        "Amenity",
-        "Review"
-    }
-
     def emptyline(self):
         """Do nothing upon receiving an empty line."""
         pass
@@ -92,7 +75,7 @@ class HBNBCommand(cmd.Cmd):
         argl = parse(arg)
         if len(argl) == 0:
             print("** class name missing **")
-        elif argl[0] not in HBNBCommand.__classes:
+        elif argl[0] not in storage.classes():
             print("** class doesn't exist **")
         else:
             print(eval(argl[0])().id)
@@ -106,7 +89,7 @@ class HBNBCommand(cmd.Cmd):
         objdict = storage.all()
         if len(argl) == 0:
             print("** class name missing **")
-        elif argl[0] not in HBNBCommand.__classes:
+        elif argl[0] not in storage.classes():
             print("** class doesn't exist **")
         elif len(argl) == 1:
             print("** instance id missing **")
@@ -122,7 +105,7 @@ class HBNBCommand(cmd.Cmd):
         objdict = storage.all()
         if len(argl) == 0:
             print("** class name missing **")
-        elif argl[0] not in HBNBCommand.__classes:
+        elif argl[0] not in storage.classes():
             print("** class doesn't exist **")
         elif len(argl) == 1:
             print("** instance id missing **")
@@ -137,7 +120,7 @@ class HBNBCommand(cmd.Cmd):
         Display string representations of all instances of a given class.
         If no class is specified, displays all instantiated objects."""
         argl = parse(arg)
-        if len(argl) > 0 and argl[0] not in HBNBCommand.__classes:
+        if len(argl) > 0 and argl[0] not in storage.classes():
             print("** class doesn't exist **")
         else:
             objl = []
@@ -170,7 +153,7 @@ class HBNBCommand(cmd.Cmd):
         if len(argl) == 0:
             print("** class name missing **")
             return False
-        if argl[0] not in HBNBCommand.__classes:
+        if argl[0] not in storage.classes():
             print("** class doesn't exist **")
             return False
         if len(argl) == 1:
@@ -206,6 +189,7 @@ class HBNBCommand(cmd.Cmd):
                 else:
                     obj.__dict__[k] = v
         storage.save()
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
