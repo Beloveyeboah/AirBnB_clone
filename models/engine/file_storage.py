@@ -1,100 +1,54 @@
 #!/usr/bin/python3
-
-"""serializes instances to a JSON file and
-deserializes JSON file to instances"""
-
+"""
+    Define class FileStorage Module
+"""
 import json
-import os
-import datetime
+import models
 
 
 class FileStorage:
-    """this creates the path to the json files"""
-
+    """
+        Serializes instances to JSON file and deserializes to JSON file.
+    """
     __file_path = "file.json"
     __objects = {}
 
     def all(self):
-        """returns all dictionaries"""
-
-        return FileStorage.__objects
+        """
+            Return the dictionary
+        """
+        return self.__objects
 
     def new(self, obj):
-        """sets key and values"""
-
-        key = obj.__class__.name__ + "." + obj.id
-        FileStorage.__objects[key] = obj
+        """
+        Set new obj into __objects
+        """
+        key = str(obj.__class__.__name__) + "." + str(obj.id)
+        value_dict = obj
+        FileStorage.__objects[key] = value_dict
 
     def save(self):
-        """serializes python objects into json"""
+        """
+        Serializes the objects into JSON file
+        """
+        objects_dict = {}
+        for key, val in FileStorage.__objects.items():
+            objects_dict[key] = val.to_dict()
 
-        with open(FileStorage.__file_path, "w", encoding="utf-8") as file:
-            d = {k: v.to_dict() for k, v in FileStorage.__objects.items()}
-            json.dump(d, file)
+        with open(FileStorage.__file_path, mode='w', encoding="UTF8") as fd:
+            json.dump(objects_dict, fd)
 
     def reload(self):
-        """loads from the save json files"""
+        """
+        Reload the file and deserializes JSON into __objects
+        """
 
-        if os.path.exists(FileStorage.__file_path):
-            with open(FileStorage.__file_path, "r", encoding="utf-8") as file:
-                obj_dict = json.load(file)
-                obj_dict = {k: self.classes()[v["__class__"]](**v)
-                            for k, v in obj_dict.items()}
-            FileStorage.__objects = obj_dict
-
-    def attributes(self):
-        """Returns the valid attributes and their types for classname"""
-        attributes = {
-            "BaseModel":
-                     {"id": str,
-                      "created_at": datetime.datetime,
-                      "updated_at": datetime.datetime},
-            "User":
-                     {"email": str,
-                      "password": str,
-                      "first_name": str,
-                      "last_name": str},
-            "State":
-                     {"name": str},
-            "City":
-                     {"state_id": str,
-                      "name": str},
-            "Amenity":
-                     {"name": str},
-            "Place":
-                     {"city_id": str,
-                      "user_id": str,
-                      "name": str,
-                      "description": str,
-                      "number_rooms": int,
-                      "number_bathrooms": int,
-                      "max_guest": int,
-                      "price_by_night": int,
-                      "latitude": float,
-                      "longitude": float,
-                      "amenity_ids": list},
-            "Review":
-            {"place_id": str,
-                         "user_id": str,
-                         "text": str}
-        }
-        return attributes
-
-    def classes(self):
-        """Returns a dictionary of valid classes and their references"""
-        from models.base_model import BaseModel
-        from models.user import User
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.place import Place
-        from models.review import Review
-
-        classes = {"BaseModel": BaseModel,
-                   "User": User,
-                   "State": State,
-                   "City": City,
-                   "Amenity": Amenity,
-                   "Place": Place,
-                   "Review": Review}
-        return classes
+        try:
+            with open(FileStorage.__file_path, encoding="UTF8") as fd:
+                FileStorage.__objects = json.load(fd)
+            for key, val in FileStorage.__objects.items():
+                class_name = val["__class__"]
+                class_name = models.classes[class_name]
+                FileStorage.__objects[key] = class_name(**val)
+        except FileNotFoundError:
+            pass
