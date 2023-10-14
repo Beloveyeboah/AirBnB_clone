@@ -34,8 +34,8 @@ class BaseModel():
         """this method converts into strings for
         easy printing"""
 
-        class_name = self.__class__.__name__
-        return "[{}] ({}) {}".format(class_name, self.id, self.__dict__)
+        return "[{}] ({}) {}".\
+            format(type(self).__name__, self.id, self.__dict__)
 
     def save(self):
         """this method records and saves the date and time any when
@@ -49,7 +49,7 @@ class BaseModel():
         storrage into json Objects"""
 
         obj_dict = self.__dict__.copy()
-        obj_dict['__class__'] = self.__class__.__name__
+        obj_dict['__class__'] = type(self).__name__
         obj_dict['created_at'] = obj_dict["created_at"].isoformat()
         obj_dict['updated_at'] = obj_dict["updated_at"].isoformat()
         return (obj_dict)
