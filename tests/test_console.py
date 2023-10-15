@@ -27,7 +27,6 @@ class TestHBNBCommand(unittest.TestCase):
         """allocating resources"""
         models.storage._FileStorage__objects = {}
 
-
     def test_do_EOF(self):
         """tests do_EOF"""
         with patch('sys.stdout', new=StringIO()) as f:
