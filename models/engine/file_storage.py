@@ -1,49 +1,48 @@
-#!/usr/bin/python3
-"""FileStorage module"""
+# !/usr/bin/python3
+"""import module"""
 import json
-from models.base_model import BaseModel
-from models.user import User
-from models.amenity import Amenity
-from models.city import City
-from models.state import State
-from models.place import Place
-from models.review import Review
 
 
-class FileStorage:
-    """class FileStorage """
-    __file_path = 'file.json'
+class FileStorage():
+    """class"""
+    __file_path = "file.json"
     __objects = {}
 
     def all(self):
-        """all method that returns a dictionary of objects -
-        Returns:dictionary of objects"""
-        return self.__objects
+        """returns diction"""
+        return FileStorage.__objects
 
     def new(self, obj):
-        """new method which adds object to __objects dict """
-        if obj:
-            key = '{}.{}'.format(type(obj).__name__, obj.id)
-            self.__objects[key] = obj
+        """set obj """
+        obj_id = obj.id
+        obj_name = obj.__class__.__name__
+        FileStorage.__objects[obj_name + "." + str(obj_id)] = obj
 
     def save(self):
-        """save method to a JSON file"""
-        obj_dict = {}
-        for key, obj in self.__objects.items():
-            obj_dict[key] = obj.to_dict()
-
-        json_str = json.dumps(obj_dict)
-
-        with open(self.__file_path, 'w', encoding='utf-8') as f:
-            f.write(json_str)
+        """serializes"""
+        new_dict = {}
+        for key, value in FileStorage.__objects.items():
+            new_dict[key] = value.to_dict()
+        with open(FileStorage.__file_path, "w", encoding="UTF8") \
+                as fil_name:
+            json.dump(new_dict, fil_name)
 
     def reload(self):
-        """reload method takes JSON file and puts them into objects"""
+        """deserializes"""
+        from models.base_model import BaseModel
+        from models.base_model import BaseModel
+        from models.user import User
+        from models.place import Place
+        from models.state import State
+        from models.city import City
+        from models.amenity import Amenity
+        from models.review import Review
         try:
-            with open(self.__file_path, 'r', encoding='utf-8') as f:
-                json_dict = json.load(f)
-                for obj_dict in json_dict.values():
-                    cls = obj_dict['__class__']
-                    self.new(eval('{}({})'.format(cls, '**obj_dict')))
+            with open(FileStorage.__file_path,
+                      encoding="utf-8-sig") as file_name2:
+                data = json.load(file_name2)
+                cls = '__class__'
+                for key, value in data.items():
+                    FileStorage.__objects[key] = eval(value[cls] + '(**value)')
         except FileNotFoundError:
             pass
