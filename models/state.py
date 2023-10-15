@@ -8,3 +8,7 @@ class State(BaseModel):
     """to manage state of users"""
 
     name = ""
+
+    def __init__(self, *args, **kwargs):
+        """ Initialization method """
+        super().__init__(*args, **kwargs)
